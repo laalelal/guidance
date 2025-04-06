@@ -60,7 +60,7 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
     defaultValues: {
       schoolName: "",
       schoolBoard: "",
-      percentage: undefined,
+      percentage: "", // String instead of number for percentage
       mathMarks: undefined,
       scienceMarks: undefined,
       englishMarks: undefined,
@@ -381,7 +381,8 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
                       placeholder="85.5" 
                       {...field}
                       onChange={(e) => {
-                        const value = e.target.value ? parseFloat(e.target.value) : undefined;
+                        // Keep the value as a string instead of converting to number
+                        const value = e.target.value;
                         field.onChange(value);
                       }}
                       value={field.value?.toString() || ""}
