@@ -7,8 +7,10 @@ import CareerRecommendations from "@/components/ui/career-recommendations";
 export default function DashboardPage() {
   const { user } = useAuth();
   
+  // The ProtectedRoute component will handle the authentication check
+  // This is just an extra safety check
   if (!user) {
-    return null; // Protected routes should handle this case
+    return <div>Loading...</div>;
   }
 
   return (

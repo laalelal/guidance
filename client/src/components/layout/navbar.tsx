@@ -30,7 +30,7 @@ export default function Navbar() {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/">
-                <a className="text-primary font-bold text-xl">Career Guidance System</a>
+                <span className="text-primary font-bold text-xl cursor-pointer">Career Guidance System</span>
               </Link>
             </div>
           </div>
@@ -38,18 +38,18 @@ export default function Navbar() {
           <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-8">
             {navLinks.map((link) => (
               <Link key={link.name} href={link.href}>
-                <a className={`text-gray-500 hover:text-primary px-3 py-2 text-sm font-medium ${location === link.href ? 'text-primary' : ''}`}>
+                <span className={`text-gray-500 hover:text-primary px-3 py-2 text-sm font-medium cursor-pointer ${location === link.href ? 'text-primary' : ''}`}>
                   {link.name}
-                </a>
+                </span>
               </Link>
             ))}
             
             {user ? (
               <div className="flex items-center space-x-4">
                 <Link href="/dashboard">
-                  <a className={`text-gray-500 hover:text-primary px-3 py-2 text-sm font-medium ${location === '/dashboard' ? 'text-primary' : ''}`}>
+                  <span className={`text-gray-500 hover:text-primary px-3 py-2 text-sm font-medium cursor-pointer ${location === '/dashboard' ? 'text-primary' : ''}`}>
                     Dashboard
-                  </a>
+                  </span>
                 </Link>
                 <Button 
                   variant="ghost" 
@@ -62,9 +62,9 @@ export default function Navbar() {
               </div>
             ) : (
               <Link href="/auth">
-                <a className="text-gray-500 hover:text-primary px-3 py-2 text-sm font-medium">
+                <span className="text-gray-500 hover:text-primary px-3 py-2 text-sm font-medium cursor-pointer">
                   Login
-                </a>
+                </span>
               </Link>
             )}
           </div>
@@ -88,8 +88,8 @@ export default function Navbar() {
           <div className="pt-2 pb-3 space-y-1">
             {navLinks.map((link) => (
               <Link key={link.name} href={link.href}>
-                <a 
-                  className={`block pl-3 pr-4 py-2 border-l-4 ${
+                <span 
+                  className={`block pl-3 pr-4 py-2 border-l-4 cursor-pointer ${
                     location === link.href 
                       ? 'border-primary text-primary' 
                       : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
@@ -97,15 +97,15 @@ export default function Navbar() {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.name}
-                </a>
+                </span>
               </Link>
             ))}
             
             {user ? (
               <>
                 <Link href="/dashboard">
-                  <a 
-                    className={`block pl-3 pr-4 py-2 border-l-4 ${
+                  <span 
+                    className={`block pl-3 pr-4 py-2 border-l-4 cursor-pointer ${
                       location === '/dashboard' 
                         ? 'border-primary text-primary' 
                         : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
@@ -113,7 +113,7 @@ export default function Navbar() {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Dashboard
-                  </a>
+                  </span>
                 </Link>
                 <button
                   className="block w-full text-left pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
@@ -128,12 +128,12 @@ export default function Navbar() {
               </>
             ) : (
               <Link href="/auth">
-                <a 
-                  className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
+                <span 
+                  className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 cursor-pointer"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Login
-                </a>
+                </span>
               </Link>
             )}
           </div>
