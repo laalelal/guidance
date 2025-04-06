@@ -16,6 +16,11 @@ export function calculateQuizScores(answers: QuizAnswer[]): {
   let mathQuizScore = 0;
   let verbalScore = 0;
 
+  // Group questions by category for easy reference
+  const logicalQs = logicalQuestions.reduce((acc, q) => ({ ...acc, [q.id]: q }), {});
+  const mathQs = mathQuestions.reduce((acc, q) => ({ ...acc, [q.id]: q }), {});
+  const verbalQs = verbalQuestions.reduce((acc, q) => ({ ...acc, [q.id]: q }), {});
+
   // Calculate score for each category
   answers.forEach(answer => {
     const question = allQuizQuestions.find(q => q.id === answer.questionId);
@@ -60,29 +65,65 @@ export function determineRecommendedStream(
   const hindiMarks = user.hindiMarks || 0;
   const socialScienceMarks = user.socialScienceMarks || 0;
   
-  // Weight for academic scores vs quiz scores (60% academic, 40% quiz)
+  // Maximum possible scores
+  const maxQuizCategoryScore = 10; // 10 questions per category
+  const maxSubjectMarks = 100; // Assuming marks are out of 100
+  
+  // Normalize quiz scores (0-1 scale)
+  const normalizedLogicalScore = scores.logicalScore / maxQuizCategoryScore;
+  const normalizedMathScore = scores.mathQuizScore / maxQuizCategoryScore;
+  const normalizedVerbalScore = scores.verbalScore / maxQuizCategoryScore;
+  
+  // Normalize academic scores (0-1 scale)
+  const normalizedMathMarks = mathMarks / maxSubjectMarks;
+  const normalizedScienceMarks = scienceMarks / maxSubjectMarks;
+  const normalizedEnglishMarks = englishMarks / maxSubjectMarks;
+  const normalizedHindiMarks = hindiMarks / maxSubjectMarks;
+  const normalizedSocialScienceMarks = socialScienceMarks / maxSubjectMarks;
+  
+  // Weights for different factors
   const academicWeight = 0.6;
-  const quizWeight = 0.4;
+  const quizWeight = 0.35;
+  const preferenceWeight = 0.05;
   
-  // Science aptitude = Math marks + Science marks + Math quiz score + Logical quiz score
+  // Calculate aptitude scores for each stream
+  
+  // Science stream aptitude
+  const scienceAcademic = (normalizedMathMarks * 0.6) + (normalizedScienceMarks * 0.4);
+  const scienceQuiz = (normalizedMathScore * 0.6) + (normalizedLogicalScore * 0.4);
+  // Factor in preference - small boost if this is their preferred stream
+  const sciencePreference = (user.preferredStream === 'Science') ? 1 : 0;
+  
+  // Commerce stream aptitude
+  const commerceAcademic = (normalizedMathMarks * 0.5) + (normalizedSocialScienceMarks * 0.3) + (normalizedEnglishMarks * 0.2);
+  const commerceQuiz = (normalizedLogicalScore * 0.6) + (normalizedMathScore * 0.3) + (normalizedVerbalScore * 0.1);
+  const commercePreference = (user.preferredStream === 'Commerce') ? 1 : 0;
+  
+  // Arts stream aptitude
+  const artsAcademic = (normalizedEnglishMarks * 0.4) + (normalizedHindiMarks * 0.2) + (normalizedSocialScienceMarks * 0.4);
+  const artsQuiz = (normalizedVerbalScore * 0.6) + (normalizedLogicalScore * 0.3) + (normalizedMathScore * 0.1);
+  const artsPreference = (user.preferredStream === 'Arts') ? 1 : 0;
+  
+  // Calculate weighted final scores for each stream
   const scienceAptitude = 
-    (academicWeight * (mathMarks + scienceMarks) / 2) + 
-    (quizWeight * (scores.mathQuizScore * 10 + scores.logicalScore * 5));
+    (scienceAcademic * academicWeight) + 
+    (scienceQuiz * quizWeight) + 
+    (sciencePreference * preferenceWeight);
   
-  // Commerce aptitude = Math marks + Social Science marks + Math quiz score + Logical quiz score
   const commerceAptitude = 
-    (academicWeight * (mathMarks + socialScienceMarks) / 2) + 
-    (quizWeight * (scores.mathQuizScore * 5 + scores.logicalScore * 10));
+    (commerceAcademic * academicWeight) + 
+    (commerceQuiz * quizWeight) + 
+    (commercePreference * preferenceWeight);
   
-  // Arts aptitude = English marks + Hindi marks + Social Science marks + Verbal quiz score
   const artsAptitude = 
-    (academicWeight * (englishMarks + hindiMarks + socialScienceMarks) / 3) + 
-    (quizWeight * (scores.verbalScore * 10));
+    (artsAcademic * academicWeight) + 
+    (artsQuiz * quizWeight) + 
+    (artsPreference * preferenceWeight);
   
   // Determine recommended stream based on highest aptitude score
-  if (scienceAptitude > commerceAptitude && scienceAptitude > artsAptitude) {
+  if (scienceAptitude >= commerceAptitude && scienceAptitude >= artsAptitude) {
     return 'Science';
-  } else if (commerceAptitude > scienceAptitude && commerceAptitude > artsAptitude) {
+  } else if (commerceAptitude >= scienceAptitude && commerceAptitude >= artsAptitude) {
     return 'Commerce';
   } else {
     return 'Arts';

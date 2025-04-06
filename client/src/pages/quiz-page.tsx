@@ -11,8 +11,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, ArrowRight, CheckCircle2, AlertCircle, BookOpen, School, Briefcase, Share2 } from "lucide-react";
 import { Redirect } from "wouter";
+import { streamData } from "@/data/career-stream-data";
+import StreamRecommendationDetails from "@/components/quiz/stream-recommendation-details";
 
 export default function QuizPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -171,50 +173,69 @@ export default function QuizPage() {
 
   // If user has already taken the quiz, show results page
   if (existingResults) {
+    // Get the recommended stream data
+    const recommendedStream = existingResults?.recommendedStream as 'Science' | 'Commerce' | 'Arts' || 'Science';
+    const streamInfo = streamData[recommendedStream];
+    
     return (
       <div className="container max-w-4xl py-8">
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl sm:text-3xl bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">Career Aptitude Quiz Results</CardTitle>
-            <CardDescription>You have already completed the Career Aptitude Quiz</CardDescription>
+            <CardDescription>Your personalized academic and career recommendations</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg text-center">
-                  <h3 className="font-medium text-lg">Logical Reasoning</h3>
-                  <div className="mt-2 text-3xl font-bold text-blue-600">{existingResults?.logicalScore || 0}/10</div>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg text-center">
-                  <h3 className="font-medium text-lg">Mathematics</h3>
-                  <div className="mt-2 text-3xl font-bold text-green-600">{existingResults?.mathQuizScore || 0}/10</div>
-                </div>
-                <div className="bg-purple-50 p-4 rounded-lg text-center">
-                  <h3 className="font-medium text-lg">Verbal Ability</h3>
-                  <div className="mt-2 text-3xl font-bold text-purple-600">{existingResults?.verbalScore || 0}/10</div>
+            <div className="space-y-8">
+              {/* Quiz Score Summary */}
+              <div>
+                <h3 className="text-lg font-medium mb-4">Your Quiz Performance</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-blue-50 p-4 rounded-lg text-center">
+                    <h3 className="font-medium text-lg">Logical Reasoning</h3>
+                    <div className="mt-2 text-3xl font-bold text-blue-600">{existingResults?.logicalScore || 0}/10</div>
+                  </div>
+                  <div className="bg-green-50 p-4 rounded-lg text-center">
+                    <h3 className="font-medium text-lg">Mathematics</h3>
+                    <div className="mt-2 text-3xl font-bold text-green-600">{existingResults?.mathQuizScore || 0}/10</div>
+                  </div>
+                  <div className="bg-purple-50 p-4 rounded-lg text-center">
+                    <h3 className="font-medium text-lg">Verbal Ability</h3>
+                    <div className="mt-2 text-3xl font-bold text-purple-600">{existingResults?.verbalScore || 0}/10</div>
+                  </div>
                 </div>
               </div>
               
               <Separator />
               
-              <div className="bg-slate-50 p-6 rounded-lg">
-                <h3 className="text-xl font-semibold mb-2">Recommended Stream</h3>
-                <div className="flex items-center gap-2 text-2xl font-bold text-primary">
-                  <CheckCircle2 className="h-6 w-6" />
-                  {existingResults?.recommendedStream || "Unknown"}
+              {/* Recommended Stream Header */}
+              <div className="bg-primary/10 p-6 rounded-lg">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <h3 className="text-xl font-semibold">Your Recommended Stream</h3>
+                    <div className="flex items-center gap-2 text-3xl font-bold text-primary mt-2">
+                      <CheckCircle2 className="h-7 w-7" />
+                      {recommendedStream}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button asChild variant="outline" size="sm">
+                      <a href="/dashboard">
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Dashboard
+                      </a>
+                    </Button>
+                  </div>
                 </div>
-                <p className="mt-3 text-slate-600">
-                  Based on your academic performance and quiz results, we recommend the {existingResults?.recommendedStream || "Science"} stream 
-                  for your higher education. Check the dashboard for more detailed career recommendations.
+                <p className="mt-4 text-slate-600">
+                  Based on your academic performance and aptitude test results, we recommend the <strong>{recommendedStream}</strong> stream 
+                  for your higher education. Below you'll find detailed information to help you plan your academic journey.
                 </p>
               </div>
+              
+              {/* Stream Details */}
+              <StreamRecommendationDetails streamData={streamInfo} />
             </div>
           </CardContent>
-          <CardFooter className="flex justify-center">
-            <Button asChild className="mt-4">
-              <a href="/">View Dashboard</a>
-            </Button>
-          </CardFooter>
         </Card>
       </div>
     );
