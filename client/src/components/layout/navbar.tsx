@@ -51,6 +51,11 @@ export default function Navbar() {
                     Dashboard
                   </span>
                 </Link>
+                <Link href="/quiz">
+                  <span className={`text-gray-500 hover:text-primary px-3 py-2 text-sm font-medium cursor-pointer ${location === '/quiz' ? 'text-primary' : ''}`}>
+                    Career Quiz
+                  </span>
+                </Link>
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -113,6 +118,18 @@ export default function Navbar() {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Dashboard
+                  </span>
+                </Link>
+                <Link href="/quiz">
+                  <span 
+                    className={`block pl-3 pr-4 py-2 border-l-4 cursor-pointer ${
+                      location === '/quiz' 
+                        ? 'border-primary text-primary' 
+                        : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
+                    } text-base font-medium`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Career Quiz
                   </span>
                 </Link>
                 <button

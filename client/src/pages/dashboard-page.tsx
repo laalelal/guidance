@@ -60,10 +60,20 @@ export default function DashboardPage() {
                 )}
               </div>
               
-              <div>
+              <div className="mb-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Career Recommendations</h3>
                 <CareerRecommendations />
               </div>
+              
+              {!user.quizResults && (
+                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Take the Career Aptitude Quiz</h3>
+                  <p className="text-gray-600 mb-4">Take our comprehensive career aptitude quiz to get a detailed assessment of your strengths and receive personalized stream recommendations based on your aptitude.</p>
+                  <a href="/quiz" className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    Start Career Quiz
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>

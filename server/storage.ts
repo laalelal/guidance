@@ -1,4 +1,4 @@
-import { users, type User, type InsertUser } from "@shared/schema";
+import { users, type User, type InsertUser, type QuizAnswer, type QuizResult } from "@shared/schema";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
@@ -10,14 +10,23 @@ import { pool } from "./db";
 
 // Storage interface for user operations
 export interface IStorage {
+  // User management
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined>;
+  
+  // Password reset
   createPasswordResetToken(email: string): Promise<string | null>;
   verifyResetToken(token: string): Promise<User | undefined>;
   resetPassword(token: string, newPassword: string): Promise<boolean>;
+  
+  // Quiz operations
+  saveQuizResults(userId: number, results: QuizResult): Promise<User | undefined>;
+  getQuizResults(userId: number): Promise<QuizResult | undefined>;
+  
+  // Session store
   sessionStore: session.Store;
 }
 
@@ -114,6 +123,35 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return !!updatedUser;
+  }
+
+  async saveQuizResults(userId: number, results: QuizResult): Promise<User | undefined> {
+    // Calculate recommended stream based on quiz results and academic marks
+    const user = await this.getUser(userId);
+    if (!user) return undefined;
+
+    // Update user with quiz results
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        quizTaken: true,
+        logicalScore: results.logicalScore,
+        mathQuizScore: results.mathQuizScore,
+        verbalScore: results.verbalScore,
+        quizResults: results,
+        recommendedStream: results.recommendedStream
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    return updatedUser;
+  }
+
+  async getQuizResults(userId: number): Promise<QuizResult | undefined> {
+    const user = await this.getUser(userId);
+    if (!user || !user.quizTaken || !user.quizResults) return undefined;
+    
+    return user.quizResults as QuizResult;
   }
 }
 

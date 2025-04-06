@@ -25,7 +25,7 @@ export default function HomePage() {
                 <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
                   Get personalized career guidance based on your academic strengths and interests to help you make informed decisions about your future.
                 </p>
-                <div className="mt-8 sm:flex">
+                <div className="mt-8 sm:flex gap-4">
                   <div className="rounded-md shadow">
                     <Link href={user ? "/dashboard" : "/auth"}>
                       <Button className="w-full flex items-center justify-center px-8 py-3">
@@ -33,6 +33,15 @@ export default function HomePage() {
                       </Button>
                     </Link>
                   </div>
+                  {user && (
+                    <div className="mt-3 sm:mt-0 rounded-md shadow">
+                      <Link href="/quiz">
+                        <Button variant="outline" className="w-full flex items-center justify-center px-8 py-3">
+                          Take Career Quiz
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="mt-12 lg:mt-0">
@@ -119,7 +128,7 @@ export default function HomePage() {
               <span className="block">Ready to discover your path?</span>
               <span className="block text-white">Start your career journey today.</span>
             </h2>
-            <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
+            <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0 gap-4">
               <div className="inline-flex rounded-md shadow">
                 <Link href={user ? "/dashboard" : "/auth"}>
                   <Button className="bg-white text-primary hover:bg-gray-50">
@@ -127,6 +136,15 @@ export default function HomePage() {
                   </Button>
                 </Link>
               </div>
+              {user && (
+                <div className="inline-flex rounded-md shadow">
+                  <Link href="/quiz">
+                    <Button variant="outline" className="bg-primary-100 border-white text-white hover:bg-primary-200">
+                      Take Career Quiz
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

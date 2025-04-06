@@ -11,6 +11,7 @@ import ContactPage from "@/pages/contact-page";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import ResetPasswordPage from "@/pages/reset-password-page";
+import QuizPage from "@/pages/quiz-page";
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
+      <ProtectedRoute path="/quiz" component={QuizPage} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, numeric, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, numeric, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -25,6 +25,14 @@ export const users = pgTable("users", {
   englishMarks: integer("english_marks"),
   hindiMarks: integer("hindi_marks"),
   socialScienceMarks: integer("social_science_marks"),
+  // Quiz Results
+  quizTaken: boolean("quiz_taken").default(false),
+  logicalScore: integer("logical_score"),
+  mathQuizScore: integer("math_quiz_score"),
+  verbalScore: integer("verbal_score"),
+  quizResults: jsonb("quiz_results").$type<Record<string, any>>(),
+  // Stream Recommendations
+  recommendedStream: text("recommended_stream"),
   // Preferences
   preferredStream: text("preferred_stream"),
   // Password reset fields
@@ -91,6 +99,36 @@ export const resetPasswordSchema = z.object({
   path: ["confirmPassword"],
 });
 
+// Quiz question schema
+export const quizQuestionSchema = z.object({
+  id: z.number(),
+  category: z.enum(['logical', 'math', 'verbal']),
+  question: z.string(),
+  options: z.array(z.string()),
+  correctAnswer: z.number(),
+});
+
+// Quiz answer schema
+export const quizAnswerSchema = z.object({
+  questionId: z.number(),
+  selectedOption: z.number(),
+});
+
+// Complete quiz submission schema
+export const quizSubmissionSchema = z.object({
+  answers: z.array(quizAnswerSchema),
+});
+
+// Quiz result schema
+export const quizResultSchema = z.object({
+  logicalScore: z.number(),
+  mathQuizScore: z.number(),
+  verbalScore: z.number(),
+  totalScore: z.number(),
+  answers: z.array(quizAnswerSchema),
+  recommendedStream: z.enum(['Science', 'Commerce', 'Arts']),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type LoginCredentials = z.infer<typeof loginSchema>;
@@ -99,3 +137,7 @@ export type RegistrationStep2 = z.infer<typeof registrationStep2Schema>;
 export type RegistrationStep3 = z.infer<typeof registrationStep3Schema>;
 export type ForgotPasswordRequest = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>;
+export type QuizQuestion = z.infer<typeof quizQuestionSchema>;
+export type QuizAnswer = z.infer<typeof quizAnswerSchema>;
+export type QuizSubmission = z.infer<typeof quizSubmissionSchema>;
+export type QuizResult = z.infer<typeof quizResultSchema>;
