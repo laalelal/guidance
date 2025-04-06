@@ -12,9 +12,10 @@ import { Loader2 } from "lucide-react";
 
 interface LoginFormProps {
   onSwitchToSignup: () => void;
+  onSwitchToForgotPassword: () => void;
 }
 
-export default function LoginForm({ onSwitchToSignup }: LoginFormProps) {
+export default function LoginForm({ onSwitchToSignup, onSwitchToForgotPassword }: LoginFormProps) {
   const { loginMutation } = useAuth();
   const [rememberMe, setRememberMe] = useState(false);
   const { toast } = useToast();
@@ -83,9 +84,13 @@ export default function LoginForm({ onSwitchToSignup }: LoginFormProps) {
               </label>
             </div>
             <div className="text-sm">
-              <a href="#" className="font-medium text-primary hover:text-primary/80">
+              <Button 
+                variant="link" 
+                className="p-0 font-medium text-primary hover:text-primary/80"
+                onClick={onSwitchToForgotPassword}
+              >
                 Forgot password?
-              </a>
+              </Button>
             </div>
           </div>
           

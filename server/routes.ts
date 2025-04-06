@@ -1,10 +1,81 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
+import { storage } from "./storage";
+import { sendEmail, generatePasswordResetEmail } from "./email-service";
+import { forgotPasswordSchema, resetPasswordSchema } from "@shared/schema";
+import { hashPassword } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
   setupAuth(app);
+
+  // Forgot password route
+  app.post("/api/forgot-password", async (req, res) => {
+    try {
+      const { email } = forgotPasswordSchema.parse(req.body);
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user) {
+        // Don't reveal if the email exists or not
+        return res.status(200).json({ message: "If your email is registered, you will receive a password reset link." });
+      }
+      
+      const token = await storage.createPasswordResetToken(email);
+      
+      if (!token) {
+        return res.status(500).json({ message: "Failed to create password reset token" });
+      }
+      
+      // Get base URL from request
+      const baseUrl = `${req.protocol}://${req.get("host")}`;
+      const emailOptions = generatePasswordResetEmail(email, token, baseUrl);
+      
+      const emailSent = await sendEmail(emailOptions);
+      
+      if (!emailSent) {
+        return res.status(500).json({ message: "Failed to send password reset email" });
+      }
+      
+      return res.status(200).json({ message: "Password reset email sent" });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      return res.status(400).json({ message: "Invalid request" });
+    }
+  });
+  
+  // Verify reset token
+  app.get("/api/verify-reset-token/:token", async (req, res) => {
+    const { token } = req.params;
+    const user = await storage.verifyResetToken(token);
+    
+    if (!user) {
+      return res.status(400).json({ valid: false, message: "Invalid or expired token" });
+    }
+    
+    return res.status(200).json({ valid: true });
+  });
+  
+  // Reset password
+  app.post("/api/reset-password", async (req, res) => {
+    try {
+      const { token, password } = resetPasswordSchema.parse(req.body);
+      
+      // Hash the new password
+      const hashedPassword = await hashPassword(password);
+      
+      const success = await storage.resetPassword(token, hashedPassword);
+      
+      if (!success) {
+        return res.status(400).json({ message: "Failed to reset password. Token may be invalid or expired." });
+      }
+      
+      return res.status(200).json({ message: "Password reset successful. You can now log in with your new password." });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      return res.status(400).json({ message: "Invalid request" });
+    }
+  });
 
   // Career guidance recommendations based on user data
   app.get("/api/recommendations", (req, res) => {
